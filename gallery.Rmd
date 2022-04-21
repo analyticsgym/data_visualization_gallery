@@ -1,0 +1,41 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+required_packages <- c('tidyverse','openintro','tidytuesdayR', 'ggthemes')
+
+for(p in required_packages){
+  if(!require(p,character.only = TRUE))
+      install.packages(p, repos = "http://cran.us.r-project.org")
+  library(p,character.only = TRUE)
+}
+```
+
+# Bar chart
+
+```{r}
+mpg %>%
+      tabyl(manufacturer) %>%
+      ggplot(aes(x=reorder(manufacturer, -percent),
+                 y=percent)) +
+      geom_col(fill="dodgerblue", alpha=0.8) +
+      geom_text(aes(label=paste0("n=",n)), vjust=-0.5, size=2) +
+      theme_tufte() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+            axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+      scale_y_continuous(labels = scales::percent_format(accuracy=1),
+                         breaks = seq(0,1,.02),
+                         expand = expansion(mult = c(0, .1))) +
+      labs(title="Distribution of Cars of by Manufacturer",
+           y="Percent of\nTotal",
+           x="Manufacturer")
+```
+
+
+
+# Histogram
+
+# Scatter
+
