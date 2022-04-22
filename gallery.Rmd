@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 required_packages <- c('tidyverse', 'janitor', 'ggthemes',
-                       'openintro', 'ggrepel')
+                       'openintro', 'ggrepel', 'ggpubr')
 
 for(p in required_packages){
   if(!require(p,character.only = TRUE))
@@ -63,8 +63,14 @@ states_scatter <- us_rent_income %>%
 
 states_scatter %>%
   ggplot(aes(x=rent, y=income)) + 
-  geom_point() +
-  geom_text_repep(aes(label=state_abb))
+  geom_smooth(method="lm") +
+  stat_cor(p.accuracy = 0.001, r.accuracy = 0.01) +
+  geom_text_repel(aes(label=state_abb), 
+                  box.padding=0.01,
+                  size=2.5,
+                  font.face="bold") +
+  base_plot_theme()
+  
   
 ```
 
