@@ -4,38 +4,90 @@ output: html_notebook
 ---
 
 ```{r}
-required_packages <- c('tidyverse','openintro','tidytuesdayR', 'ggthemes')
+required_packages <- c('tidyverse', 'janitor', 'ggthemes', 'openintro')
 
 for(p in required_packages){
   if(!require(p,character.only = TRUE))
       install.packages(p, repos = "http://cran.us.r-project.org")
   library(p,character.only = TRUE)
 }
+
+base_plot_theme <- function() {
+  theme_tufte() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+        axis.text = element_text(face="bold"),
+        axis.title.y = element_text(angle = 0, vjust = 0.5),
+        axis.ticks = element_blank())
+  }
 ```
 
 # Bar chart
 
 ```{r}
 mpg %>%
-      tabyl(manufacturer) %>%
-      ggplot(aes(x=reorder(manufacturer, -percent),
-                 y=percent)) +
-      geom_col(fill="dodgerblue", alpha=0.8) +
-      geom_text(aes(label=paste0("n=",n)), vjust=-0.5, size=2) +
-      theme_tufte() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
-            axis.title.y = element_text(angle = 0, vjust = 0.5)) +
-      scale_y_continuous(labels = scales::percent_format(accuracy=1),
-                         breaks = seq(0,1,.02),
-                         expand = expansion(mult = c(0, .1))) +
-      labs(title="Distribution of Cars of by Manufacturer",
-           y="Percent of\nTotal",
-           x="Manufacturer")
+  tabyl(manufacturer) %>%
+  ggplot(aes(x=reorder(manufacturer, -percent),
+             y=percent)) +
+  geom_col(fill="dodgerblue", alpha=0.8) +
+  geom_text(aes(label=paste0("n=",n)), vjust=-0.5, size=2) +
+  base_plot_theme() +
+  scale_y_continuous(labels = scales::percent_format(accuracy=1),
+                     breaks = seq(0,1,.02),
+                     expand = expansion(mult = c(0, .1))) +
+  labs(title="Distribution of Cars of by Manufacturer",
+       y="Percent of\nTotal",
+       x="Manufacturer")
+```
+
+# Stacked Bar Chart
+- with layer labels
+
+```{r}
+Titanic
 ```
 
 
 
 # Histogram
 
-# Scatter
+# Density Plot
+
+# Scatter Plot
+
+# Faceted with Grid
+
+# Faceted with Wrap
+
+# Labels on trend lines end points
+
+# Dumbbell Plot
+
+```{r}
+library(directlabels)
+mpg_mm <- mpg %>%
+  group_by(year, manufacturer) %>%
+  count() %>%
+  group_by(year) %>%
+  mutate(pct_total = n/sum(n)) %>%
+  ungroup()
+
+db_plot <- mpg_mm %>%
+  ggplot(aes(x=factor(year),
+             y=pct_total,
+             color=manufacturer,
+             group=manufacturer)) +
+  geom_line(alpha=0.7, size=1.5) +
+  geom_point() +
+  scale_y_continuous(labels = scales::percent_format(accuracy=1),
+                   breaks = seq(0,1,.02)) +
+  scale_x_discrete(expand = expansion(mult = c(0.05, 6))) +
+  base_plot_theme() +
+  theme(axis.title.x = element_text(hjust = 0, margin = margin(t=6))) +
+  labs(title = "1999 vs 2008",
+       subtitle="Manufacturer Percent Total Change",
+       x="Year",
+       y="Percent of\nTotal")
+
+direct.label(db_plot,  list(dl.trans(x=x+0.25), cex=0.5, "last.qp"))
+```
 
