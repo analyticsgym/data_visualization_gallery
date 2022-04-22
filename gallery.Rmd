@@ -4,7 +4,8 @@ output: html_notebook
 ---
 
 ```{r}
-required_packages <- c('tidyverse', 'janitor', 'ggthemes', 'openintro')
+required_packages <- c('tidyverse', 'janitor', 'ggthemes',
+                       'openintro', 'ggrepel')
 
 for(p in required_packages){
   if(!require(p,character.only = TRUE))
@@ -43,16 +44,31 @@ mpg %>%
 - with layer labels
 
 ```{r}
-Titanic
+state.x77
 ```
-
-
 
 # Histogram
 
 # Density Plot
 
 # Scatter Plot
+
+
+```{r}
+states_scatter <- us_rent_income %>%
+  select(NAME, variable, estimate) %>%
+  pivot_wider(names_from=variable, values_from=estimate) %>%
+  mutate(state_abb = usdata::state2abbr(NAME)) %>%
+  filter(NAME!="Puerto Rico") ### drop PR | no income data
+
+states_scatter %>%
+  ggplot(aes(x=rent, y=income)) + 
+  geom_point() +
+  geom_text_repep(aes(label=state_abb))
+  
+```
+
+
 
 # Faceted with Grid
 
