@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 required_packages <- c('tidyverse', 'janitor', 'ggthemes',
-                       'openintro', 'ggrepel', 'ggpubr')
+                       'openintro', 'ggrepel', 'ggpubr', 'scales')
 
 for(p in required_packages){
   if(!require(p,character.only = TRUE))
@@ -44,15 +44,70 @@ mpg %>%
 - with layer labels
 
 ```{r}
-state.x77
+ames_stacked <- ames %>%
+  clean_names() %>%
+  mutate(neighborhood_grouped = fct_lump_n(neighborhood,n=9)) %>%
+  group_by(neighborhood_grouped, house_style) %>%
+  count() %>%
+  group_by(neighborhood_grouped) %>%
+  mutate(pct_total_neighborhood = n/sum(n)) %>%
+  ungroup()
+  
+### orders the plot sequence of how the neighborhoods and house style appear
+ames_stacked <- ames_stacked %>%
+  group_by(neighborhood_grouped) %>%
+  mutate(one_story_nh_pct_total = max(
+    ifelse(house_style=="One_Story",pct_total_neighborhood,NA),
+    na.rm = T
+   )
+  ) %>%
+  ungroup() %>%
+  mutate(neighborhood_grouped = fct_reorder(
+    neighborhood_grouped, 
+    one_story_nh_pct_total 
+   )
+  ) %>%
+  ungroup() %>%
+  mutate(house_style = fct_reorder2(
+    house_style, 
+    neighborhood_grouped, 
+    pct_total_neighborhood
+   )
+  )
+
+ames_stacked %>%
+  ### only label if stack pct total greater than 4%
+  mutate(stack_label = case_when(
+    pct_total_neighborhood > .04 ~ scales::percent(pct_total_neighborhood,2)
+  )) %>%
+  ggplot(aes(x=neighborhood_grouped,
+             y=pct_total_neighborhood,
+             fill=house_style)) +
+  geom_col(position = "stack", alpha=0.75) +
+  geom_text(aes(label = stack_label),
+            position = position_stack(vjust = 0.5),
+            size=3) +
+  base_plot_theme() +
+  theme(legend.title = element_text(size = 8), 
+        legend.text = element_text(size = 8),
+        axis.text.y = element_blank()) +
+  labs(title="Ames, IA: House Syle Sold\n2006 to 2010 by Neighborhood Group",
+    x="Neighborhood Group",
+    y="Percent\nof Total",
+    fill="House Style")
 ```
 
 # Histogram
+```{r}
+### ggpubr for out of the box histograms with ease
+```
 
 # Density Plot
+```{r}
+### ggpubr for out of the box density charts
+```
 
 # Scatter Plot
-
 
 ```{r}
 states_scatter <- us_rent_income %>%
@@ -64,17 +119,19 @@ states_scatter <- us_rent_income %>%
 states_scatter %>%
   ggplot(aes(x=rent, y=income)) + 
   geom_smooth(method="lm") +
-  stat_cor(p.accuracy = 0.001, r.accuracy = 0.01) +
+  stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cor.coef.name="r") +
   geom_text_repel(aes(label=state_abb), 
                   box.padding=0.01,
                   size=2.5,
                   font.face="bold") +
-  base_plot_theme()
-  
-  
+  scale_x_continuous(labels=dollar_format()) +
+  scale_y_continuous(labels=dollar_format()) +
+  base_plot_theme() +
+  labs(title = "US State\nMedian Yearly Income vs Median Monthly Rent",
+       x="Median Monthly Rent",
+       y="Median \nYearly \nIncome ",
+       caption = "r = pearson correlation coefficient")
 ```
-
-
 
 # Faceted with Grid
 
