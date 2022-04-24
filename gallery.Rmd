@@ -91,7 +91,7 @@ ames_stacked %>%
   theme(legend.title = element_text(size = 8), 
         legend.text = element_text(size = 8),
         axis.text.y = element_blank()) +
-  labs(title="Ames, IA: House Syle Sold\n2006 to 2010 by Neighborhood Group",
+  labs(title="Ames, IA: House Style Sold\n2006 to 2010 by Neighborhood Group",
     x="Neighborhood Group",
     y="Percent\nof Total",
     fill="House Style")
@@ -132,6 +132,10 @@ states_scatter %>%
        y="Median \nYearly \nIncome ",
        caption = "r = pearson correlation coefficient")
 ```
+
+# Boxplot
+- compare US region median income 
+- use above states data and pull in region var
 
 # Faceted with Grid
 
