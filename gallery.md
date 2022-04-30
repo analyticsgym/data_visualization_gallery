@@ -1,16 +1,13 @@
----
-title: "R Data Visualization Gallery"
-output: rmarkdown::github_document
----
-
-```{r echo=FALSE, include = FALSE}
-knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
-```
+R Data Visualization Gallery
+================
 
 ### Notebook Purpose
-- R code patterns for common business data visualizations
 
-```{r}
+  - R code patterns for common business data visualizations
+
+<!-- end list -->
+
+``` r
 required_packages <- c('tidyverse', 'janitor', 'ggthemes',
                        'openintro', 'ggrepel', 'ggpubr', 'scales',
                        'directlabels', 'fpp3')
@@ -32,7 +29,8 @@ base_plot_theme <- function() {
 ```
 
 ### Bar Chart
-```{r}
+
+``` r
 mpg %>%
   tabyl(manufacturer) %>%
   ggplot(aes(x=reorder(manufacturer, -percent),
@@ -48,8 +46,11 @@ mpg %>%
        x="Manufacturer")
 ```
 
+![](gallery_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
 ### Stacked Bar Chart
-```{r}
+
+``` r
 ames_stacked <- ames %>%
   clean_names() %>%
   mutate(neighborhood_grouped = fct_lump_n(neighborhood,n=9)) %>%
@@ -103,8 +104,11 @@ ames_stacked %>%
     fill="House Style")
 ```
 
+![](gallery_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
 ### Histogram
-```{r}
+
+``` r
 # using ggpubr for fast out of the box presentation ready charts
 ChickWeight %>% filter(Diet==1 | Diet==3) %>%
   ggpubr::gghistogram(
@@ -122,8 +126,11 @@ ChickWeight %>% filter(Diet==1 | Diet==3) %>%
      y="Chick\nCount")
 ```
 
+![](gallery_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
 ### Density Plot
-```{r}
+
+``` r
 diamonds %>%
   filter(cut %in% c("Fair", "Ideal"),
          carat <= 3) %>%
@@ -145,8 +152,11 @@ diamonds %>%
      y="Carat\nDensity")
 ```
 
+![](gallery_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
 ### Scatter Plot
-```{r}
+
+``` r
 states_scatter <- us_rent_income %>%
   select(NAME, variable, estimate) %>%
   pivot_wider(names_from=variable, values_from=estimate) %>%
@@ -169,8 +179,11 @@ states_scatter %>%
        caption = "r = pearson correlation coefficient")
 ```
 
+![](gallery_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
 ### Bubble Plot
-```{r}
+
+``` r
 state_to_region <- tibble(
   state_abb = state.abb,
   state_region = state.region
@@ -196,8 +209,11 @@ Percent of Individuals Collecting Social Security",
        caption = "\nSome overlapping state abbreviations not shown")
 ```
 
+![](gallery_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
 ### Boxplot
-```{r}
+
+``` r
 state_stats %>%
   inner_join(state_to_region, by = c("abbr" = "state_abb")) %>%
   mutate(state_region = fct_reorder(state_region, med_income, median)) %>%
@@ -220,8 +236,11 @@ state_stats %>%
        y = "Median\nHousehold\nIncome")
 ```
 
+![](gallery_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
 ### Time Series Trend Line Plots
-```{r}
+
+``` r
 pigs_ts <- tsibbledata::aus_livestock %>%
    filter(Animal=="Pigs",
           Month>=yearmonth('1990-01-01'),
@@ -241,8 +260,11 @@ pigs_ts %>%
        y="Pig  \nCount  ")
 ```
 
+![](gallery_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
 ### Multi-panel Trend Line Plots for Comparison
-```{r}
+
+``` r
 gafa_stock_2 <- gafa_stock %>%
   filter(year(Date) >= 2018) %>%
   group_by(Symbol) %>%
@@ -265,8 +287,11 @@ gafa_stock_2 %>%
        y="Stock\nClose\nPrice")
 ```
 
+![](gallery_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
 ### Dumbbell Plot
-```{r}
+
+``` r
 mpg_mm <- mpg %>%
   group_by(year, manufacturer) %>%
   count() %>%
@@ -293,3 +318,5 @@ db_plot <- mpg_mm %>%
 
 direct.label(db_plot,  list(dl.trans(x=x+0.25), cex=0.5, "last.qp"))
 ```
+
+![](gallery_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
