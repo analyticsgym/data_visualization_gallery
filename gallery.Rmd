@@ -6,7 +6,7 @@ output: html_notebook
 ```{r}
 required_packages <- c('tidyverse', 'janitor', 'ggthemes',
                        'openintro', 'ggrepel', 'ggpubr', 'scales',
-                       'directlabels')
+                       'directlabels', 'fpp3')
 
 for(p in required_packages){
   if(!require(p,character.only = TRUE))
@@ -199,11 +199,23 @@ state_stats %>%
        y = "Median\nHousehold\nIncome")
 ```
 
-# Faceted with Grid
-
-# Faceted with Wrap
-
 # Labels on trend lines end points
+
+```{r}
+pigs_ts <- aus_livestock %>%
+   filter(Animal=="Pigs",
+          Month>=yearmonth('1990-01-01'),
+          Month<=yearmonth('1995-12-01'),
+          State=="Victoria")
+
+### TODO: fix y axis with comma and add labels
+pigs_ts %>%
+  fpp3::gg_season(Count, labels="both", size=2, alpha=0.5) +
+  base_plot_theme() +
+  scale_x_yearmonth(expand = expansion(mult=c(.075,.075)),
+                    date_breaks = "1 month",
+                    date_label = "%b")
+```
 
 # Dumbbell Plot
 
@@ -234,6 +246,24 @@ db_plot <- mpg_mm %>%
 
 direct.label(db_plot,  list(dl.trans(x=x+0.25), cex=0.5, "last.qp"))
 ```
+
+
+# Faceted with Grid
+```{r}
+?gafa_stock
+glimpse(gafa_stock)
+### Historical stock prices from 2014-2018 for Google, Amazon, Facebook and Apple. All prices are in $USD.
+
+prices %>%
+  filter_index("1950" ~ .) %>%
+  pivot_longer(cols =  c("eggs", "chicken", "copper", "nails", "oil", "wheat")) %>%
+  gg_subseries(labels = "both")
+```
+
+
+
+# Faceted with Wrap
+
 ### Bubble Plots
 
 ```{r}
@@ -246,4 +276,10 @@ state_stats %>%
   gghighlight(pop2010/1000000 > 10, label_key = abbr) 
 ```
 
+# Misc
 
+```{r}
+prices %>%
+  filter_index("1950" ~ .) %>%
+  GGally::ggpairs(columns = 2:6, progress = F)
+```
