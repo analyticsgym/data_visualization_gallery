@@ -1,6 +1,11 @@
 R Data Visualization Gallery
 ================
 
+### TODOs:
+
+  - update image resolution settings
+  - add US states plot
+
 ### Notebook Purpose
 
   - R code patterns for common data visualizations
@@ -322,6 +327,12 @@ db_plot <- mpg_mm %>%
 direct.label(db_plot,  list(dl.trans(x=x+0.25), cex=0.5, "last.qp"))
 ```
 
+<<<<<<< Updated upstream
 ![TRUE](gallery_files/figure-gfm/unnamed-chunk-12-1.png)
 
 TODOs: - geo based plots
+||||||| constructed merge base
+![](gallery_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+=======
+![TRUE](gallery_files/figure-gfm/unnamed-chunk-12-1.png)
+>>>>>>> Stashed changes

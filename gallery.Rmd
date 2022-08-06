@@ -4,11 +4,11 @@ output: rmarkdown::github_document
 ---
 
 ```{r echo=FALSE, include = FALSE}
-knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dpi=700, fig.cap=TRUE)
 ```
 
 ### Notebook Purpose
-- R code patterns for common business data visualizations
+- R code patterns for common data visualizations
 
 ```{r}
 required_packages <- c('tidyverse', 'janitor', 'ggthemes',
@@ -91,6 +91,7 @@ ames_stacked %>%
              fill=house_style_2)) +
   geom_col(position = "stack", alpha=0.75) +
   geom_text(aes(label = stack_label),
+            ### note pattern here to get labels to center on bar stack
             position = position_stack(vjust = 0.5),
             size=3) +
   base_plot_theme() +
@@ -191,7 +192,7 @@ state_stats %>%
   base_plot_theme() +
   labs(title = "US State: Median Income vs 
 Percent of Individuals Collecting Social Security",
-       x="Percent of Individuals Collecting Social Security",
+       x="\nPercent of Individuals Collecting Social Security",
        y="Median\nHousehold\nIncome",
        caption = "\nSome overlapping state abbreviations not shown")
 ```
@@ -200,9 +201,11 @@ Percent of Individuals Collecting Social Security",
 ```{r}
 state_stats %>%
   inner_join(state_to_region, by = c("abbr" = "state_abb")) %>%
-  mutate(state_region = fct_reorder(state_region, med_income, median)) %>%
-  ggboxplot(x = "state_region", y = "med_income",
-    color = "state_region", alpha = 0.85) +
+  mutate(state_region_2 = fct_reorder(state_region, med_income, median)) %>%
+  ggplot(aes(x=state_region_2,
+             y=med_income,
+             color=state_region_2)) +
+  geom_boxplot(alpha = 0.85) +
   geom_text_repel(aes(label = abbr),
     direction = "y",
     nudge_x = .15,
@@ -293,3 +296,6 @@ db_plot <- mpg_mm %>%
 
 direct.label(db_plot,  list(dl.trans(x=x+0.25), cex=0.5, "last.qp"))
 ```
+
+TODOs:
+- geo based plots
