@@ -296,6 +296,3 @@ db_plot <- mpg_mm %>%
 
 direct.label(db_plot,  list(dl.trans(x=x+0.25), cex=0.5, "last.qp"))
 ```
-
-TODOs:
-- geo based plots
