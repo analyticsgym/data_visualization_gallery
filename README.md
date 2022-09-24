@@ -2,8 +2,7 @@ R Data Visualization Gallery
 ================
 
 ### TODOs:
-
-  - update image resolution settings
+  - geo lat and long density plots
   - add US states plot
 
 ### Notebook Purpose
