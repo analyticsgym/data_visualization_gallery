@@ -296,3 +296,9 @@ db_plot <- mpg_mm %>%
 
 direct.label(db_plot,  list(dl.trans(x=x+0.25), cex=0.5, "last.qp"))
 ```
+
+
+### TO BE ADDED
+- GGally::ggpairs for correlation values, scatterplot, varianble distribution view
+- Heatmap using size aesthetic
+- Line plots with line type and point shape aesthetic
