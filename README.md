@@ -3,14 +3,14 @@ R Data Visualization Gallery
 
 ### Notebook Purpose
 
-  - R code patterns for common data visualizations
+  - R code patterns for common data visualization use cases
 
 <!-- end list -->
 
 ``` r
 required_packages <- c('tidyverse', 'janitor', 'ggthemes',
                        'openintro', 'ggrepel', 'ggpubr', 'scales',
-                       'directlabels', 'fpp3')
+                       'directlabels', 'fpp3', "tidytext", "tsdl")
 
 for(p in required_packages){
   ### uncomment to install packages not on your machine
@@ -323,3 +323,79 @@ direct.label(db_plot,  list(dl.trans(x=x+0.25), cex=0.5, "last.qp"))
 ```
 
 ![TRUE](gallery_files/figure-gfm/unnamed-chunk-12-1.png)
+
+### Ordered Facet Plot
+
+  - [Inspired by Julia Silge’s blog
+    post](https://juliasilge.com/blog/reorder-within/)
+
+<!-- end list -->
+
+``` r
+data("USArrests")
+
+tidy_usarrests <- USArrests %>%
+  rownames_to_column(var = "State") %>%
+  gather(key="metric", value="value", -State) %>%
+  mutate(metric = as.factor(metric))
+
+tidy_usarrests %>%
+  ungroup() %>%
+  mutate(State = tidytext::reorder_within(x = State, by = value, within = metric)) %>%
+  group_by(metric) %>%
+  arrange(desc(value)) %>%
+  filter(row_number()<=10) %>%
+  ggplot(aes(x=value,
+             y=State,
+             fill=metric)) +
+  geom_col(alpha=0.75) +
+  tidytext::scale_y_reordered() +
+  facet_wrap(. ~ metric, scale="free", ncol=2) +
+  base_plot_theme() +
+  theme(legend.position = "none") +
+  labs(x="Metric Value",
+       title="Example Facet Plot with Ranking by Metric Panel",
+       subtitle = "Leveraging tidytext reorder_within function")
+```
+
+![TRUE](gallery_files/figure-gfm/unnamed-chunk-13-1.png)
+
+### Line Chart with Shape/Line Type Aesthetic
+
+  - Color blind friendly approach
+
+<!-- end list -->
+
+``` r
+tsdl::tsdl[[448]] %>% 
+   as_tibble() %>%
+   mutate(time_index = row_number()) %>%
+   rename(paperback = Paperback) %>% 
+   gather(key="book_type", value="Sales", -time_index) %>%
+   ggplot(aes(x=time_index,
+              y=Sales,
+              group=book_type,
+              color=book_type,
+              shape=book_type,
+              linetype=book_type)) +
+   geom_line(alpha=0.5, size=1.25) +
+   geom_point(alpha=0.5, size=3) +
+   scale_x_continuous(breaks=seq(0, 30, 1)) +
+   scale_color_manual(values = c("grey40", "dodgerblue")) +
+   base_plot_theme() +
+   labs(title = "Book Sales: Weeks from Launch",
+        subtitle = "Example Scenario",
+        x= "Weeks from Launch",
+        color = "Book Type",
+        shape = "Book Type",
+        linetype = "Book Type")
+```
+
+![TRUE](gallery_files/figure-gfm/unnamed-chunk-14-1.png)
+
+### TO BE ADDED
+
+  - GGally::ggpairs for correlation values, scatterplot, variable
+    distribution view
+  - Heatmap using size aesthetic (use movies data from ggplot2movies
+    package)
