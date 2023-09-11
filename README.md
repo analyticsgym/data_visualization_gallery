@@ -3,14 +3,14 @@ R Data Visualization Gallery
 
 ### Notebook Purpose
 
-  - R code patterns for common data visualization use cases
-
-<!-- end list -->
+- R code patterns for common data visualization use cases
 
 ``` r
+# devtools::install_github("FinYang/tsdl")
 required_packages <- c('tidyverse', 'janitor', 'ggthemes',
                        'openintro', 'ggrepel', 'ggpubr', 'scales',
-                       'directlabels', 'fpp3', "tidytext", "tsdl")
+                       'directlabels', 'fpp3', "tidytext", 'tsdl',
+                       'patchwork')
 
 for(p in required_packages){
   ### uncomment to install packages not on your machine
@@ -46,7 +46,10 @@ mpg %>%
        x="Manufacturer")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-3-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-3-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Stacked Bar Chart
 
@@ -105,7 +108,10 @@ ames_stacked %>%
     fill="House Style")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-4-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-4-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Histogram
 
@@ -127,7 +133,10 @@ ChickWeight %>% filter(Diet==1 | Diet==3) %>%
      y="Chick\nCount")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-5-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-5-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Density Plot
 
@@ -153,7 +162,10 @@ diamonds %>%
      y="Carat\nDensity")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-6-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-6-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Scatter Plot
 
@@ -180,7 +192,70 @@ states_scatter %>%
        caption = "r = pearson correlation coefficient")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-7-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-7-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
+
+### Side by Side Distribution Plots
+
+``` r
+summary_data <- mtcars %>%
+  summarise(
+    p10 = quantile(mpg, 0.10),
+    p25 = quantile(mpg, 0.25),
+    p50 = quantile(mpg, 0.50),
+    p75 = quantile(mpg, 0.75),
+    p90 = quantile(mpg, 0.90)
+  ) %>%
+  tidyr::gather(key = "percentile", value = "value")
+
+scat_plot <- mtcars %>%
+  ggplot(aes(x="", y = mpg)) +
+  # Add custom box plot
+  geom_jitter(width = 0.1, height = 0.01, alpha=0.2) + 
+  geom_point(data=summary_data, aes(y=value),
+    shape = 24, # triangle with fill color
+    alpha = 0.5,
+    fill = "dodgerblue",
+    size = 3
+  ) +
+  geom_text_repel(data = summary_data, aes(label = percentile, x="", y = value),
+          position = position_dodge(0.7), hjust = -2, direction = "y") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
+  labs(x = "Observations",
+       y="MPG",
+       title = "")
+
+hist_plot <- 
+  mtcars %>%
+  ggplot(aes(x = mpg)) +
+  geom_histogram(binwidth = 3, fill = "dodgerblue", alpha = 0.6) +
+  geom_vline(aes(xintercept = mean(mpg)), color="salmon", 
+             linetype = "dashed", size = 1, show.legend = F) +
+  geom_text(aes(x = mean(mpg), y=0, label="Average"),
+            vjust=-0.75, hjust=-2) +
+  coord_flip() +
+    labs(x = "MPG",
+         y= "Count",
+         title = "")
+
+hist_plot + scat_plot +
+  plot_annotation(
+    title = "Miles Per Gallon (MPG) Data Distribution",
+    caption = "Source: mtcars dataset",
+    theme = theme(
+      plot.title = element_text(hjust = 0.5, size = 12),
+      plot.caption = element_text(hjust = 1, size = 6)
+    )
+  )
+```
+
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-8-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Bubble Plot
 
@@ -210,7 +285,10 @@ Percent of Individuals Collecting Social Security",
        caption = "\nSome overlapping state abbreviations not shown")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-8-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-9-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Boxplot
 
@@ -239,7 +317,10 @@ state_stats %>%
        y = "Median\nHousehold\nIncome")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-9-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-10-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Time Series Trend Line Plots
 
@@ -263,7 +344,10 @@ pigs_ts %>%
        y="Pig  \nCount  ")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-10-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-11-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Multi-panel Trend Line Plots for Comparison
 
@@ -290,7 +374,10 @@ gafa_stock_2 %>%
        y="Stock\nClose\nPrice")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-11-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-12-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Dumbbell Plot
 
@@ -322,14 +409,15 @@ db_plot <- mpg_mm %>%
 direct.label(db_plot,  list(dl.trans(x=x+0.25), cex=0.5, "last.qp"))
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-12-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-13-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Ordered Facet Plot
 
-  - [Inspired by Julia Silge’s blog
-    post](https://juliasilge.com/blog/reorder-within/)
-
-<!-- end list -->
+- [Inspired by Julia Silge’s blog
+  post](https://juliasilge.com/blog/reorder-within/)
 
 ``` r
 data("USArrests")
@@ -358,13 +446,14 @@ tidy_usarrests %>%
        subtitle = "Leveraging tidytext reorder_within function")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-13-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-14-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### Line Chart with Shape/Line Type Aesthetic
 
-  - Color blind friendly approach
-
-<!-- end list -->
+- Color blind friendly approach
 
 ``` r
 tsdl::tsdl[[448]] %>% 
@@ -391,11 +480,14 @@ tsdl::tsdl[[448]] %>%
         linetype = "Book Type")
 ```
 
-![TRUE](gallery_files/figure-gfm/unnamed-chunk-14-1.png)
+<figure>
+<img src="gallery_files/figure-gfm/unnamed-chunk-15-1.png" alt="TRUE" />
+<figcaption aria-hidden="true">TRUE</figcaption>
+</figure>
 
 ### TO BE ADDED
 
-  - GGally::ggpairs for correlation values, scatterplot, variable
-    distribution view
-  - Heatmap using size aesthetic (use movies data from ggplot2movies
-    package)
+- GGally::ggpairs for correlation values, scatterplot, variable
+  distribution view
+- Heatmap using size aesthetic (use movies data from ggplot2movies
+  package)

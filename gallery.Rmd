@@ -11,9 +11,11 @@ knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dpi=700, fig.cap=
 - R code patterns for common data visualization use cases
 
 ```{r}
+# devtools::install_github("FinYang/tsdl")
 required_packages <- c('tidyverse', 'janitor', 'ggthemes',
                        'openintro', 'ggrepel', 'ggpubr', 'scales',
-                       'directlabels', 'fpp3', "tidytext", "tsdl")
+                       'directlabels', 'fpp3', "tidytext", 'tsdl',
+                       'patchwork')
 
 for(p in required_packages){
   ### uncomment to install packages not on your machine
@@ -168,6 +170,62 @@ states_scatter %>%
        x="Median Monthly Rent",
        y="Median \nYearly \nIncome ",
        caption = "r = pearson correlation coefficient")
+```
+
+
+### Side by Side Distribution Plots
+
+```{r}
+summary_data <- mtcars %>%
+  summarise(
+    p10 = quantile(mpg, 0.10),
+    p25 = quantile(mpg, 0.25),
+    p50 = quantile(mpg, 0.50),
+    p75 = quantile(mpg, 0.75),
+    p90 = quantile(mpg, 0.90)
+  ) %>%
+  tidyr::gather(key = "percentile", value = "value")
+
+scat_plot <- mtcars %>%
+  ggplot(aes(x="", y = mpg)) +
+  # Add custom box plot
+  geom_jitter(width = 0.1, height = 0.01, alpha=0.2) + 
+  geom_point(data=summary_data, aes(y=value),
+    shape = 24, # triangle with fill color
+    alpha = 0.5,
+    fill = "dodgerblue",
+    size = 3
+  ) +
+  geom_text_repel(data = summary_data, aes(label = percentile, x="", y = value),
+          position = position_dodge(0.7), hjust = -2, direction = "y") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
+  labs(x = "Observations",
+       y="MPG",
+       title = "")
+
+hist_plot <- 
+  mtcars %>%
+  ggplot(aes(x = mpg)) +
+  geom_histogram(binwidth = 3, fill = "dodgerblue", alpha = 0.6) +
+  geom_vline(aes(xintercept = mean(mpg)), color="salmon", 
+             linetype = "dashed", size = 1, show.legend = F) +
+  geom_text(aes(x = mean(mpg), y=0, label="Average"),
+            vjust=-0.75, hjust=-2) +
+  coord_flip() +
+    labs(x = "MPG",
+         y= "Count",
+         title = "")
+
+hist_plot + scat_plot +
+  plot_annotation(
+    title = "Miles Per Gallon (MPG) Data Distribution",
+    caption = "Source: mtcars dataset",
+    theme = theme(
+      plot.title = element_text(hjust = 0.5, size = 12),
+      plot.caption = element_text(hjust = 1, size = 6)
+    )
+  )
 ```
 
 ### Bubble Plot
